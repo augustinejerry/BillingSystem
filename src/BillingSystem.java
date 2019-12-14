@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -19,6 +20,8 @@ public class BillingSystem {
 	private JFrame frame;
 	private JTextField username;
 	private JPasswordField password;
+	private JLabel failureMessage;
+	private boolean userExists;
 
 	/**
 	 * Launch the application.
@@ -52,6 +55,8 @@ public class BillingSystem {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
+		userExists = false;
+		
 		JLabel lblSignature = new JLabel("Signature");
 		lblSignature.setBounds(133, 33, 183, 32);
 		lblSignature.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 26));
@@ -84,8 +89,11 @@ public class BillingSystem {
 				DBConnection dbc = new DBConnection();
 				rs = dbc.getResultSet("SELECT password, employee_id, (SELECT ISNULL(max(order_id),0) + 1 FROM orders) invoice_id FROM users WHERE username = '" + usernameTyped + "'");
 				
+				
+				
 				try {
 					while (rs.next()) {
+						userExists = true;
 						passwordSaved = rs.getString(1);
 						employeeIdSaved = Integer.parseInt(rs.getString(2));
 						invoiceNo = Integer.parseInt(rs.getString(3));
@@ -98,16 +106,14 @@ public class BillingSystem {
 					if (rs != null) try { rs.close(); } catch(Exception e) {}
 				}
 				
-				if (passwordSaved.equals(passwordTyped)) {
+				if (userExists && passwordSaved.equals(passwordTyped)) {
 					//goto billing page
-					System.out.println("Login successfull");
 					frame.setVisible(false);
-					System.out.println(invoiceNo);
 			        new BillingPage(employeeIdSaved, invoiceNo).setVisible(true);
 				}
 				else {
 					//print error message
-					System.out.println("login failed");
+					failureMessage.setText("Incorrect Username/Password!");
 				}
 			}
 		});
@@ -121,6 +127,11 @@ public class BillingSystem {
 		password.setBounds(163, 138, 183, 22);
 		frame.getContentPane().add(password);
 		frame.getContentPane().add(btnNewButton);
+		
+		failureMessage = new JLabel("");
+		failureMessage.setBounds(124, 216, 222, 16);
+		failureMessage.setForeground(Color.RED);
+		frame.getContentPane().add(failureMessage);
 	}
 
 	public void setVisible(boolean b) {

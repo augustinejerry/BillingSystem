@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
+import java.awt.Color;
 
 public class BillingPage extends JFrame {
 
@@ -52,6 +53,7 @@ public class BillingPage extends JFrame {
 	private int orderLineCount;
 	private JTextField discountField;
 	private JTextField taxField;
+	private JLabel errorLabel;
 	float subtotal = 0;
 	float discount = 0;
 	float subtotalAfterDiscount = 0;
@@ -75,7 +77,6 @@ public class BillingPage extends JFrame {
 			}
 		});
 	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -244,44 +245,53 @@ public class BillingPage extends JFrame {
 		contentPane.add(taxField);
 		taxField.setColumns(10);
 		
-//		
-//	    Object[][] data = {{1,"sad",2,3,4,5}};    
-//		String column[]={"Barcode", "Description", "Quantity", "Price", "Discount", "Total"};     
-//		
-//		
-//		
-//		TableModel model = new DefaultTableModel(data,column);  
-//		
-//		JTable table = new JTable(model) {
-//	        private static final long serialVersionUID = 1L;
-//
-//	        public boolean isCellEditable(int row, int column) {                
-//	                return column == 1;               
-//	        };
-//	    };
-//	    
-//	    
-//	    
-//	    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//	    table.getColumnModel().getColumn(0).setPreferredWidth(100);
-//	    table.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-//	    table.getColumnModel().getColumn(1).setPreferredWidth(300);
-//	    table.getColumnModel().getColumn(2).setPreferredWidth(70);
-//	    table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
-//	    table.getColumnModel().getColumn(3).setPreferredWidth(70);
-//	    table.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
-//	    table.getColumnModel().getColumn(4).setPreferredWidth(70);
-//	    table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-//	    table.getColumnModel().getColumn(5).setPreferredWidth(90);
-//	    table.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
-//	    
-//	    JScrollPane sp=new JScrollPane(table);
-//        sp.setBounds(34, 345, 703, 250);
-//		contentPane.add(sp);
+		JLabel lblNewLabel_1 = new JLabel(String.valueOf(invoiceNo));
+		lblNewLabel_1.setBounds(514, 99, 56, 16);
+		contentPane.add(lblNewLabel_1);
+		
+		customerLNameField = new JTextField();
+		customerLNameField.setBounds(240, 96, 149, 22);
+		contentPane.add(customerLNameField);
+		customerLNameField.setColumns(10);
+		
+		JLabel lblCity = new JLabel("City");
+		lblCity.setBounds(67, 169, 31, 16);
+		contentPane.add(lblCity);
+		
+		cityField = new JTextField();
+		cityField.setBounds(99, 166, 290, 22);
+		contentPane.add(cityField);
+		cityField.setColumns(10);
+		
+		JLabel lblProvince = new JLabel("Province");
+		lblProvince.setBounds(42, 193, 56, 16);
+		contentPane.add(lblProvince);
+		
+		provinceField = new JTextField();
+		provinceField.setBounds(99, 190, 137, 22);
+		contentPane.add(provinceField);
+		provinceField.setColumns(10);
+		
+		JLabel lblZip = new JLabel("Zip");
+		lblZip.setBounds(240, 193, 23, 16);
+		contentPane.add(lblZip);
+		
+		zipField = new JTextField();
+		zipField.setBounds(261, 190, 128, 22);
+		contentPane.add(zipField);
+		zipField.setColumns(10);
+		
+		errorLabel = new JLabel();
+		errorLabel.setForeground(Color.RED);
+		errorLabel.setBounds(438, 193, 299, 37);
+		contentPane.add(errorLabel);
 		
 		JButton btnNewButton = new JButton("Add");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if (validation() != null)
+					errorLabel.setText(validation());
+				else {
 				System.out.println("hello");
 				String orderInsert = null;
 				String orderUpdate = null;
@@ -302,7 +312,7 @@ public class BillingPage extends JFrame {
 				String customerFName = customerFNameField.getText();
 				String addressLine1 = addressLine1Field.getText();
 				String addressLine2 = addressLine2Field.getText();
-				int contactNumber = Integer.parseInt(contactNumberField.getText());
+				long contactNumber = Long.parseLong(contactNumberField.getText());
 				String email = emailField.getText();
 				String customerLName = customerLNameField.getText();
 				String city = cityField.getText();
@@ -456,61 +466,33 @@ public class BillingPage extends JFrame {
 				discount = (subtotal * (discountRate / 100));
 				subtotalAfterDiscount = subtotal - discount;
 				tax = (subtotalAfterDiscount * (taxRate / 100));
-				balance = subtotalAfterDiscount - tax;
+				balance = subtotalAfterDiscount + tax;
 				
 				subtotalValue.setText(String.valueOf(subtotal));
 				discountValue.setText(String.valueOf(discount));
 				taxValue.setText(String.valueOf(tax));
 				subtotalAfterDiscountValue.setText(String.valueOf(subtotalAfterDiscount));
 				balanceDueValue.setText(String.valueOf(balance));
-				
+			}
 			}
 		});
 		btnNewButton.setBounds(573, 283, 97, 25);
 		contentPane.add(btnNewButton);
 		
-		JLabel lblNewLabel_1 = new JLabel(String.valueOf(invoiceNo));
-		lblNewLabel_1.setBounds(514, 99, 56, 16);
-		contentPane.add(lblNewLabel_1);
 		
-		customerLNameField = new JTextField();
-		customerLNameField.setBounds(240, 96, 149, 22);
-		contentPane.add(customerLNameField);
-		customerLNameField.setColumns(10);
-		
-		JLabel lblCity = new JLabel("City");
-		lblCity.setBounds(67, 169, 31, 16);
-		contentPane.add(lblCity);
-		
-		cityField = new JTextField();
-		cityField.setBounds(99, 166, 290, 22);
-		contentPane.add(cityField);
-		cityField.setColumns(10);
-		
-		JLabel lblProvince = new JLabel("Province");
-		lblProvince.setBounds(42, 193, 56, 16);
-		contentPane.add(lblProvince);
-		
-		provinceField = new JTextField();
-		provinceField.setBounds(99, 190, 137, 22);
-		contentPane.add(provinceField);
-		provinceField.setColumns(10);
-		
-		JLabel lblZip = new JLabel("Zip");
-		lblZip.setBounds(240, 193, 23, 16);
-		contentPane.add(lblZip);
-		
-		zipField = new JTextField();
-		zipField.setBounds(261, 190, 128, 22);
-		contentPane.add(zipField);
-		zipField.setColumns(10);
 		
 		JButton btnPrint = new JButton("Print");
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (validation() != null)
+					errorLabel.setText(validation() + " cannot be null");
+				else {
 				System.out.println("print bill");
 				String paymentMethod = comboBox.getSelectedItem().toString();
 				int result = 0;
+				discountRate = Float.parseFloat(discountField.getText());
+				taxRate = Float.parseFloat(taxField.getText());
+				
 				String orderUpdate = "UPDATE orders\r\n" + 
 						"SET payment_method = '" + paymentMethod + "'\r\n" + 
 						"	, subtotal = '" + subtotal + "'\r\n" + 
@@ -528,6 +510,8 @@ public class BillingPage extends JFrame {
 				
 				setVisible(false);
 		        new BillDisplayPage(employeeId, invoiceNo).setVisible(true);
+			
+				}
 			}
 		});
 		btnPrint.setBounds(367, 777, 97, 25);
@@ -543,7 +527,48 @@ public class BillingPage extends JFrame {
 		btnLogout.setBounds(651, 13, 97, 25);
 		contentPane.add(btnLogout);
 		
-		
+	}
+	
+	public String validation() {
+		if (contactNumberField.getText().equals("")){  
+		    contactNumberField.requestFocusInWindow();
+		    return "Please enter a contact number.";
+		}
+		else if (contactNumberField.getText().contains("[a-zA-Z]+") == false && contactNumberField.getText().length() != 10){
+			contactNumberField.requestFocusInWindow();
+		    return "Please enter a valid contact number.";
+		}
+		else if (barcodeField.getText().equals("")) {
+			barcodeField.requestFocusInWindow();
+		    return "Please scan a product.";
+		}
+		else if (quantityField.getText().equals("")) {
+			quantityField.requestFocusInWindow();
+		    return "Please enter the quantity for the scanned product.";
+		}
+		else if (barcodeField.getText() != null) {
+			ResultSet rs = null;
+			
+			DBConnection dbc = new DBConnection();
+			rs = dbc.getResultSet("SELECT COUNT(*) FROM item WHERE barcode = " + barcodeField.getText());
+
+			try {
+				while (rs.next()) {
+					if (rs.getInt(1) == 0) {
+						barcodeField.requestFocusInWindow();
+					    return "Product not found.";
+					}	
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			finally {
+				if (rs != null) try { rs.close(); } catch(Exception e) {}
+			}
+		}
+		errorLabel.setText("");
+		return null;
 	}
 	
 	public int orderLineCounter(int orderId) {

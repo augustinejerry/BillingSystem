@@ -65,7 +65,7 @@ public class BillDisplayPage extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					BillDisplayPage frame = new BillDisplayPage(1,4);
+					BillDisplayPage frame = new BillDisplayPage(1,30);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -94,20 +94,20 @@ public class BillDisplayPage extends JFrame {
 		String headerQuery = null;
 		
 		headerQuery = "SELECT c.first_name + ' ' + c.last_name fullname,\r\n" + 
-				"	c.address_line1,\r\n" + 
-				"	c.address_ine2,\r\n" + 
-				"	c.province,\r\n" + 
-				"	c.zip_code,\r\n" + 
-				"	c.contact_number,\r\n" + 
-				"	c.email_id,\r\n" + 
-				"	o.payment_method,\r\n" + 
-				"	o.subtotal,\r\n" + 
-				"	o.discount,\r\n" + 
+				"	c.address_line1 address_line1,\r\n" + 
+				"	c.address_ine2 address_line2,\r\n" + 
+				"	c.province province,\r\n" + 
+				"	c.zip_code zip_code,\r\n" + 
+				"	c.contact_number contact_number,\r\n" + 
+				"	c.email_id email_id,\r\n" + 
+				"	o.payment_method payment_method,\r\n" + 
+				"	o.subtotal subtotal,\r\n" + 
+				"	o.discount discount,\r\n" + 
 				"	o.subtotal - (o.subtotal * (o.discount / 100)) discount_amt,\r\n" + 
 				"	o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100))) subtotal_after_discount,\r\n" + 
-				"	o.tax,\r\n" + 
+				"	o.tax tax,\r\n" + 
 				"	(o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100)))) * (o.tax / 100) tax_amt,\r\n" + 
-				"	(o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100)))) - ((o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100)))) * (o.tax / 100)) balance\r\n" + 
+				"	(o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100)))) + ((o.subtotal - (o.subtotal - (o.subtotal * (o.discount / 100)))) * (o.tax / 100)) balance\r\n" + 
 				"FROM orders o\r\n" + 
 				"JOIN customer c\r\n" + 
 				"ON o.customer_id = c.customer_id\r\n" + 
@@ -142,7 +142,7 @@ public class BillDisplayPage extends JFrame {
 				lblCustomer.setBounds(34, 99, 64, 16);
 				contentPane.add(lblCustomer);
 				
-				customerFNameField = new JLabel();
+				customerFNameField = new JLabel(rs.getString("fullname"));
 				customerFNameField.setBounds(99, 96, 137, 22);
 				contentPane.add(customerFNameField);
 				
@@ -150,11 +150,11 @@ public class BillDisplayPage extends JFrame {
 				lblAddress.setBounds(44, 120, 56, 16);
 				contentPane.add(lblAddress);
 				
-				addressLine1Field = new JLabel();
+				addressLine1Field = new JLabel(rs.getString("address_line1"));
 				addressLine1Field.setBounds(99, 120, 290, 22);
 				contentPane.add(addressLine1Field);
 				
-				addressLine2Field = new JLabel();
+				addressLine2Field = new JLabel(rs.getString("address_line2"));
 				addressLine2Field.setBounds(99, 143, 290, 22);
 				contentPane.add(addressLine2Field);
 				
@@ -162,7 +162,7 @@ public class BillDisplayPage extends JFrame {
 				lblNewLabel.setBounds(26, 214, 72, 16);
 				contentPane.add(lblNewLabel);
 				
-				contactNumberField = new JLabel();
+				contactNumberField = new JLabel(rs.getString("contact_number"));
 				contactNumberField.setBounds(99, 214, 290, 22);
 				contentPane.add(contactNumberField);
 				
@@ -170,7 +170,7 @@ public class BillDisplayPage extends JFrame {
 				lblEmail.setBounds(53, 242, 45, 16);
 				contentPane.add(lblEmail);
 				
-				emailField = new JLabel();
+				emailField = new JLabel(rs.getString("email_id"));
 				emailField.setBounds(99, 239, 290, 22);
 				contentPane.add(emailField);
 				
@@ -201,7 +201,7 @@ public class BillDisplayPage extends JFrame {
 				discountValue.setHorizontalAlignment(SwingConstants.RIGHT);
 				contentPane.add(discountValue);
 				
-				discountField = new JLabel();
+				discountField = new JLabel(rs.getString("discount") + "%");
 				discountField.setBounds(589, 649, 46, 22);
 				discountField.setHorizontalAlignment(SwingConstants.RIGHT);
 				contentPane.add(discountField);
@@ -233,83 +233,15 @@ public class BillDisplayPage extends JFrame {
 				balanceDueValue.setHorizontalAlignment(SwingConstants.RIGHT);
 				contentPane.add(balanceDueValue);
 				
-				taxField = new JLabel();
+				taxField = new JLabel(rs.getString("tax") + "%");
 				taxField.setBounds(589, 704, 42, 22);
 				taxField.setHorizontalAlignment(SwingConstants.RIGHT);
 				contentPane.add(taxField);
-				
-
-				
-				
-						ArrayList<OrderLine> list = orderLineList(invoiceNo);
-						
-						orderLineCount = orderLineCounter(invoiceNo);
-						 System.out.println(orderLineCount);
-						Object[][] data = new Object[orderLineCount][6];    
-						String column[]={"Barcode", "Description", "Quantity", "Price", "Discount", "Total"};     
-						
-						for(int i = 0; i < list.size(); i++) {
-							data[i][0] = list.get(i).getBarcode();
-							data[i][1] = list.get(i).getDescription();
-							data[i][2] = list.get(i).getQuantity();
-							data[i][3] = list.get(i).getUnitPrice();
-							data[i][4] = list.get(i).getDiscount();
-							data[i][5] = list.get(i).getTotal();
-						 	subtotal += list.get(i).getTotal();
-						}
-						
-						TableModel model = new DefaultTableModel(data,column);  
-						
-						JTable table = new JTable(model) {
-					        private static final long serialVersionUID = 1L;
-
-					        public boolean isCellEditable(int row, int column) {                
-					                return column == 1;               
-					        };
-					    };
-					    
-					    
-					    
-					    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-					    table.getColumnModel().getColumn(0).setPreferredWidth(100);
-					    table.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-					    table.getColumnModel().getColumn(1).setPreferredWidth(300);
-					    table.getColumnModel().getColumn(2).setPreferredWidth(70);
-					    table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
-					    table.getColumnModel().getColumn(3).setPreferredWidth(70);
-					    table.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
-					    table.getColumnModel().getColumn(4).setPreferredWidth(70);
-					    table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-					    table.getColumnModel().getColumn(5).setPreferredWidth(90);
-					    table.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
-					    
-					    JScrollPane sp=new JScrollPane(table);
-				        sp.setBounds(34, 345, 703, 250);
-						contentPane.add(sp);
-						
-						discountRate = 0;
-						taxRate = 0;
-						discount = (subtotal * (discountRate / 100));
-						subtotalAfterDiscount = subtotal - discount;
-						tax = (subtotalAfterDiscount * (taxRate / 100));
-						balance = subtotalAfterDiscount - tax;
-						
-						subtotalValue.setText(String.valueOf(subtotal));
-						discountValue.setText(String.valueOf(discount));
-						taxValue.setText(String.valueOf(tax));
-						subtotalAfterDiscountValue.setText(String.valueOf(subtotalAfterDiscount));
-						balanceDueValue.setText(String.valueOf(balance));
-						
-					
-				
 				
 				JLabel lblNewLabel_1 = new JLabel(String.valueOf(invoiceNo));
 				lblNewLabel_1.setBounds(514, 99, 56, 16);
 				contentPane.add(lblNewLabel_1);
 				
-				customerLNameField = new JLabel();
-				customerLNameField.setBounds(240, 96, 149, 22);
-				contentPane.add(customerLNameField);
 				
 				JLabel lblCity = new JLabel("City");
 				lblCity.setBounds(67, 169, 31, 16);
@@ -323,7 +255,7 @@ public class BillDisplayPage extends JFrame {
 				lblProvince.setBounds(42, 193, 56, 16);
 				contentPane.add(lblProvince);
 				
-				provinceField = new JLabel();
+				provinceField = new JLabel(rs.getString("province"));
 				provinceField.setBounds(99, 190, 137, 22);
 				contentPane.add(provinceField);
 				
@@ -331,9 +263,68 @@ public class BillDisplayPage extends JFrame {
 				lblZip.setBounds(240, 193, 23, 16);
 				contentPane.add(lblZip);
 				
-				zipField = new JLabel();
+				zipField = new JLabel(rs.getString("zip_code"));
 				zipField.setBounds(261, 190, 128, 22);
 				contentPane.add(zipField);
+
+				
+				ArrayList<OrderLine> list = orderLineList(invoiceNo);
+						
+				orderLineCount = orderLineCounter(invoiceNo);
+				System.out.println(orderLineCount);
+				Object[][] data = new Object[orderLineCount][6];    
+				String column[]={"Barcode", "Description", "Quantity", "Price", "Discount", "Total"};     
+					
+				for(int i = 0; i < list.size(); i++) {
+					data[i][0] = list.get(i).getBarcode();
+					data[i][1] = list.get(i).getDescription();
+					data[i][2] = list.get(i).getQuantity();
+					data[i][3] = list.get(i).getUnitPrice();
+					data[i][4] = list.get(i).getDiscount();
+					data[i][5] = list.get(i).getTotal();
+				 	subtotal += list.get(i).getTotal();
+				}
+				
+				TableModel model = new DefaultTableModel(data,column);  
+				
+				JTable table = new JTable(model) {
+				      private static final long serialVersionUID = 1L;
+				      public boolean isCellEditable(int row, int column) {                
+				           return column == 1;               
+				      };
+				};
+					    
+					    
+					    
+				table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+				table.getColumnModel().getColumn(0).setPreferredWidth(100);
+				table.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+				table.getColumnModel().getColumn(1).setPreferredWidth(300);
+				table.getColumnModel().getColumn(2).setPreferredWidth(70);
+				table.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+				table.getColumnModel().getColumn(3).setPreferredWidth(70);
+				table.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+				table.getColumnModel().getColumn(4).setPreferredWidth(70);
+				table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+				table.getColumnModel().getColumn(5).setPreferredWidth(90);
+				table.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
+				    
+				JScrollPane sp=new JScrollPane(table);
+				sp.setBounds(34, 345, 703, 250);
+				contentPane.add(sp);
+						
+				discountRate = rs.getFloat(10);
+				taxRate = rs.getFloat(13);
+				discount = (subtotal * (discountRate / 100));
+				subtotalAfterDiscount = subtotal - discount;
+				tax = (subtotalAfterDiscount * (taxRate / 100));
+				balance = subtotalAfterDiscount + tax;
+				
+				subtotalValue.setText(String.valueOf(subtotal));
+				discountValue.setText(String.valueOf(discount));
+				taxValue.setText(String.valueOf(tax));
+				subtotalAfterDiscountValue.setText(String.valueOf(subtotalAfterDiscount));
+				balanceDueValue.setText(String.valueOf(balance));
 				
 				JButton btnLogout = new JButton("Logout");
 				btnLogout.addActionListener(new ActionListener() {
@@ -355,7 +346,7 @@ public class BillDisplayPage extends JFrame {
 				btnNextBill.setBounds(364, 791, 97, 25);
 				contentPane.add(btnNextBill);
 				
-				JLabel paymentMethodValue = new JLabel("");
+				JLabel paymentMethodValue = new JLabel(rs.getString(8));
 				paymentMethodValue.setBounds(141, 620, 56, 16);
 				contentPane.add(paymentMethodValue);
 			}
